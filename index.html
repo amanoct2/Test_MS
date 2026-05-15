@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Basic Computer & MS Paint Test</title>
 
 <style>
@@ -31,13 +32,15 @@ margin-bottom:20px;
 
 .student-info{
 margin-bottom:20px;
+display:flex;
+flex-wrap:wrap;
+gap:10px;
 }
 
 .student-info input{
 padding:10px;
-margin:5px;
-width:100%;
-max-width:250px;
+flex:1;
+min-width:200px;
 border:1px solid #ccc;
 border-radius:5px;
 }
@@ -82,10 +85,20 @@ border-radius:5px;
 cursor:pointer;
 margin:10px 5px;
 font-size:16px;
+transition:0.3s;
 }
 
 button:hover{
 background:#005fa3;
+transform:translateY(-2px);
+}
+
+#printBtn{
+background:#16a34a;
+}
+
+#printBtn:hover{
+background:#15803d;
 }
 
 #result{
@@ -93,17 +106,33 @@ text-align:center;
 font-size:24px;
 font-weight:bold;
 margin-top:20px;
-color:green;
+}
+
+#printCard{
+display:none;
 }
 
 @media print{
 
-button{
+body{
+background:white;
+}
+
+.container{
+box-shadow:none;
+}
+
+button,
+#timer,
+.question,
+.student-info,
+h1,
+#result{
 display:none;
 }
 
-#timer{
-display:none;
+#printCard{
+display:block !important;
 }
 
 }
@@ -115,15 +144,13 @@ display:none;
 
 <div class="container">
 
-<h1>Basic Computer & MS Paint Test</h1>
+<h1>💻 Basic Computer & MS Paint Test</h1>
 
 <div class="student-info">
 
 <input type="text" id="name" placeholder="Enter Student Name">
 
 <input type="text" id="batch" placeholder="Enter Batch">
-
-<br>
 
 <input type="date" id="date">
 
@@ -137,14 +164,17 @@ display:none;
 
 <div id="result"></div>
 
+<!-- PRINT RESULT CARD -->
+<div id="printCard"></div>
+
 <center>
 
-<button id="submitBtn" onclick="checkAnswers()">
-Submit Test
+<button type="button" id="submitBtn" onclick="checkAnswers()">
+✅ Submit Test
 </button>
 
-<button onclick="window.print()">
-Print Result
+<button type="button" id="printBtn" onclick="printResult()">
+🖨 Print Result
 </button>
 
 </center>
@@ -153,7 +183,7 @@ Print Result
 
 <script>
 
-// 25 QUESTIONS
+// QUESTIONS
 const questions = [
 
 ["What is a computer?","Electronic Machine","Car","Fan","Book"],
@@ -208,7 +238,7 @@ const questions = [
 
 ];
 
-// CORRECT ANSWERS
+// ANSWERS
 const answers = [
 
 "A","A","B","A","C",
@@ -232,13 +262,31 @@ form.innerHTML += `
 
 <p>${i+1}. ${q[0]}</p>
 
-<input type="radio" name="q${i}" value="A"> ${q[1]} <br><br>
+<label>
+<input type="radio" name="q${i}" value="A">
+${q[1]}
+</label>
 
-<input type="radio" name="q${i}" value="B"> ${q[2]} <br><br>
+<br><br>
 
-<input type="radio" name="q${i}" value="C"> ${q[3]} <br><br>
+<label>
+<input type="radio" name="q${i}" value="B">
+${q[2]}
+</label>
 
-<input type="radio" name="q${i}" value="D"> ${q[4]} <br>
+<br><br>
+
+<label>
+<input type="radio" name="q${i}" value="C">
+${q[3]}
+</label>
+
+<br><br>
+
+<label>
+<input type="radio" name="q${i}" value="D">
+${q[4]}
+</label>
 
 <p id="a${i}"></p>
 
@@ -311,30 +359,153 @@ box.className = "wrong";
 
 // STUDENT DETAILS
 let studentName =
-document.getElementById("name").value;
+document.getElementById("name").value || "Student";
 
 let batch =
-document.getElementById("batch").value;
+document.getElementById("batch").value || "N/A";
 
 // PERCENTAGE
 let percentage = ((score / 25) * 100).toFixed(2);
 
-// PASS / FAIL
+// STATUS
 let status = score >= 10 ? "PASS ✅" : "FAIL ❌";
 
-// RESULT
+// MESSAGE
+let message = "";
+let color = "";
+
+if(score >= 22){
+
+message = "🏆 Excellent Work! You are a Computer Champion!";
+color = "#16a34a";
+
+}
+else if(score >= 18){
+
+message = "🎉 Very Good! Keep Learning & Growing!";
+color = "#2563eb";
+
+}
+else if(score >= 10){
+
+message = "👍 Good Job! You Passed Successfully!";
+color = "#ca8a04";
+
+}
+else{
+
+message = "📚 Don't Worry! Practice More & Try Again!";
+color = "#dc2626";
+
+}
+
+// NORMAL RESULT
 document.getElementById("result").innerHTML =
 
 `
-Student Name: ${studentName}<br>
-Batch: ${batch}<br><br>
+<h2 style="color:${color};">${message}</h2>
 
-Your Score: ${score} / 25 <br>
+<br>
 
-Percentage: ${percentage}% <br><br>
+Student Name: <b>${studentName}</b><br>
+Batch: <b>${batch}</b><br><br>
 
-Status: ${status}
+Your Score: <b>${score} / 25</b><br>
+
+Percentage: <b>${percentage}%</b><br><br>
+
+Status: <b>${status}</b>
 `;
+
+// PRINT CARD
+document.getElementById("printCard").innerHTML =
+
+`
+<div style="
+max-width:700px;
+margin:30px auto;
+padding:40px;
+border-radius:20px;
+background:linear-gradient(135deg,#ffffff,#f0f9ff);
+box-shadow:0 0 20px rgba(0,0,0,0.2);
+border:8px solid ${color};
+text-align:center;
+font-family:Arial;
+">
+
+<h1 style="
+font-size:42px;
+color:${color};
+margin-bottom:10px;
+">
+🎓 Test Result
+</h1>
+
+<h2 style="
+font-size:32px;
+margin:20px 0;
+color:#111827;
+">
+${studentName}
+</h2>
+
+<p style="
+font-size:22px;
+margin:10px 0;
+">
+Batch: <b>${batch}</b>
+</p>
+
+<p style="
+font-size:28px;
+margin:20px 0;
+color:${color};
+font-weight:bold;
+">
+${message}
+</p>
+
+<div style="
+font-size:24px;
+margin-top:25px;
+line-height:1.8;
+">
+
+✅ Score: <b>${score} / 25</b><br>
+
+📊 Percentage: <b>${percentage}%</b><br>
+
+🏅 Result: <b>${status}</b>
+
+</div>
+
+<div style="
+margin-top:35px;
+font-size:18px;
+color:#555;
+">
+Basic Computer & MS Paint Test
+</div>
+
+</div>
+`;
+
+document.getElementById("printCard").style.display = "block";
+
+}
+
+// PRINT FUNCTION
+function printResult(){
+
+if(document.getElementById("printCard").innerHTML === ""){
+
+alert("Please submit the test first!");
+
+return;
+
+}
+
+window.print();
 
 }
 
