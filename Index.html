@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basic Computer & MS Paint Test</title>
+
+<style>
+
+body{
+font-family: Arial, sans-serif;
+background:#f4f4f4;
+padding:20px;
+margin:0;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+h1{
+text-align:center;
+color:#0077cc;
+margin-bottom:20px;
+}
+
+.student-info{
+margin-bottom:20px;
+}
+
+.student-info input{
+padding:10px;
+margin:5px;
+width:100%;
+max-width:250px;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+#timer{
+text-align:center;
+font-size:28px;
+font-weight:bold;
+color:red;
+margin:15px 0;
+}
+
+.question{
+background:#fafafa;
+padding:15px;
+margin-bottom:15px;
+border-left:5px solid #0077cc;
+border-radius:5px;
+}
+
+.question p{
+font-size:18px;
+font-weight:bold;
+}
+
+.correct{
+color:green;
+font-weight:bold;
+}
+
+.wrong{
+color:red;
+font-weight:bold;
+}
+
+button{
+background:#0077cc;
+color:white;
+padding:10px 18px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+margin:10px 5px;
+font-size:16px;
+}
+
+button:hover{
+background:#005fa3;
+}
+
+#result{
+text-align:center;
+font-size:24px;
+font-weight:bold;
+margin-top:20px;
+color:green;
+}
+
+@media print{
+
+button{
+display:none;
+}
+
+#timer{
+display:none;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Basic Computer & MS Paint Test</h1>
+
+<div class="student-info">
+
+<input type="text" id="name" placeholder="Enter Student Name">
+
+<input type="text" id="batch" placeholder="Enter Batch">
+
+<br>
+
+<input type="date" id="date">
+
+<input type="time" id="time">
+
+</div>
+
+<div id="timer">Time Left: 20:00</div>
+
+<form id="quizForm"></form>
+
+<div id="result"></div>
+
+<center>
+
+<button id="submitBtn" onclick="checkAnswers()">
+Submit Test
+</button>
+
+<button onclick="window.print()">
+Print Result
+</button>
+
+</center>
+
+</div>
+
+<script>
+
+// 25 QUESTIONS
+const questions = [
+
+["What is a computer?","Electronic Machine","Car","Fan","Book"],
+
+["Which shows picture?","Monitor","Mouse","Keyboard","CPU"],
+
+["Which device is used to type?","Mouse","Keyboard","Printer","Speaker"],
+
+["Which device is used to click?","Mouse","Keyboard","Monitor","Printer"],
+
+["Which key gives space?","Enter","Shift","Spacebar","Ctrl"],
+
+["Which key deletes letters?","Backspace","Shift","Alt","Tab"],
+
+["Which key starts new line?","Ctrl","Enter","Shift","Caps Lock"],
+
+["Which software is used for drawing?","Paint","Chrome","Excel","Word"],
+
+["Which tool erases drawing?","Brush","Eraser","Pencil","Text Tool"],
+
+["Which tool fills color?","Fill Tool","Brush","Pencil","Eraser"],
+
+["CPU full form?","Central Processing Unit","Central Print Unit","Computer Power Unit","Control Processing Unit"],
+
+["Which device prints paper?","Printer","Mouse","Monitor","CPU"],
+
+["Which device gives sound?","Speaker","Keyboard","Monitor","Printer"],
+
+["Which key saves file?","Ctrl+S","Ctrl+C","Ctrl+X","Ctrl+V"],
+
+["Which key copies text?","Ctrl+C","Ctrl+X","Ctrl+V","Ctrl+Z"],
+
+["Which key pastes text?","Ctrl+V","Ctrl+X","Ctrl+S","Ctrl+A"],
+
+["Which tool draws freehand?","Pencil","Eraser","Fill","Text"],
+
+["Which tool writes text?","Text Tool","Brush","Magnifier","Pencil"],
+
+["Which opens file?","Open","Save","Print","Exit"],
+
+["Which creates new file?","New","Open","Print","Close"],
+
+["Which tool zooms picture?","Magnifier","Brush","Pencil","Eraser"],
+
+["Father of Computer?","Charles Babbage","Bill Gates","Steve Jobs","Alan Turing"],
+
+["Brain of Computer?","CPU","Monitor","Mouse","Speaker"],
+
+["Which is an input device?","Keyboard","Monitor","Speaker","Printer"],
+
+["Longest key on keyboard?","Spacebar","Enter","Shift","Tab"]
+
+];
+
+// CORRECT ANSWERS
+const answers = [
+
+"A","A","B","A","C",
+"A","B","A","B","A",
+"A","A","A","A","A",
+"A","A","A","A","A",
+"A","A","A","A","A"
+
+];
+
+// CREATE QUESTIONS
+let form = document.getElementById("quizForm");
+
+for(let i=0; i<questions.length; i++){
+
+let q = questions[i];
+
+form.innerHTML += `
+
+<div class="question">
+
+<p>${i+1}. ${q[0]}</p>
+
+<input type="radio" name="q${i}" value="A"> ${q[1]} <br><br>
+
+<input type="radio" name="q${i}" value="B"> ${q[2]} <br><br>
+
+<input type="radio" name="q${i}" value="C"> ${q[3]} <br><br>
+
+<input type="radio" name="q${i}" value="D"> ${q[4]} <br>
+
+<p id="a${i}"></p>
+
+</div>
+
+`;
+
+}
+
+// TIMER
+let timeLeft = 20 * 60;
+
+let timer = setInterval(function(){
+
+let minutes = Math.floor(timeLeft / 60);
+
+let seconds = timeLeft % 60;
+
+seconds = seconds < 10 ? "0" + seconds : seconds;
+
+document.getElementById("timer").innerHTML =
+"Time Left: " + minutes + ":" + seconds;
+
+timeLeft--;
+
+if(timeLeft < 0){
+
+clearInterval(timer);
+
+checkAnswers();
+
+}
+
+},1000);
+
+// CHECK ANSWERS
+function checkAnswers(){
+
+clearInterval(timer);
+
+document.getElementById("submitBtn").disabled = true;
+
+let score = 0;
+
+for(let i=0; i<answers.length; i++){
+
+let selected =
+document.querySelector(`input[name="q${i}"]:checked`);
+
+let box = document.getElementById("a"+i);
+
+if(selected && selected.value === answers[i]){
+
+score++;
+
+box.innerHTML = "✅ Correct";
+
+box.className = "correct";
+
+}
+else{
+
+box.innerHTML = "❌ Wrong / No Answer";
+
+box.className = "wrong";
+
+}
+
+}
+
+// STUDENT DETAILS
+let studentName =
+document.getElementById("name").value;
+
+let batch =
+document.getElementById("batch").value;
+
+// PERCENTAGE
+let percentage = ((score / 25) * 100).toFixed(2);
+
+// PASS / FAIL
+let status = score >= 10 ? "PASS ✅" : "FAIL ❌";
+
+// RESULT
+document.getElementById("result").innerHTML =
+
+`
+Student Name: ${studentName}<br>
+Batch: ${batch}<br><br>
+
+Your Score: ${score} / 25 <br>
+
+Percentage: ${percentage}% <br><br>
+
+Status: ${status}
+`;
+
+}
+
+</script>
+
+</body>
+</html>
